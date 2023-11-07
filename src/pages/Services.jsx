@@ -1,138 +1,128 @@
-import { useState, useEffect } from 'react';
-import { AiFillEdit } from 'react-icons/ai';
-import { MdDeleteForever } from 'react-icons/md';
-import { RxUpdate } from 'react-icons/rx';
+import { useState } from "react";
+import { AiFillEdit } from "react-icons/ai";
+import { MdDeleteForever } from "react-icons/md";
+import { RxUpdate } from "react-icons/rx";
 
 const Services = () => {
   const initialServiceState = [
-    { id: 1, servicename: 'Ac Repair', servicecategory: '....', price: 5 },
-    { id: 2, servicename: 'Plumbing', servicecategory: '....', price: 5 },
-    { id: 3, servicename: 'Washing', servicecategory: '....', price: 5 },
-    { id: 4, servicename: 'Pest Control', servicecategory: '....', price: 5 },
+    { id: 1, servicename: "Ac Repair", servicecategory: "fgbnjng", price: 5 },
+    { id: 2, servicename: "Plumbing", servicecategory: "hnhnmmn", price: 5 },
+    { id: 3, servicename: "Washing", servicecategory: "rhgutguu", price: 5 },
+    { id: 4, servicename: "Pest Control", servicecategory: "gngnng", price: 5 },
   ];
 
   const [services, setServices] = useState(initialServiceState);
-  const [editedService, setEditedService] = useState(null);
-  const [newService, setNewService] = useState({
-    servicename: '',
-    servicecategory: '',
-    price: 0,
-    description: '',
-    image: '',
-  });
+  const [editedService, setEditedService] = useState(false);
+  const [inputState, setInputState] = useState({});
 
-  const [isAddButtonDisabled, setIsAddButtonDisabled] = useState(true);
+  const serviceSubmit = (e) => {
+    e.preventDefault();
+    const form = e.target;
+    const servicename = form.servicename.value;
+    const servicecategory = form.servicecategory.value;
+    const price = form.price.value;
+    const description = form.description.value;
 
-  useEffect(() => {
-    const { servicename, servicecategory, price } = newService;
-    setIsAddButtonDisabled(!(servicename && servicecategory && price > 0));
-  }, [newService]);
+    const newService = {
+      id: services.length + 1,
+      servicename,
+      servicecategory,
+      price,
+      description,
+      image: "",
+    };
+
+    const addedService = [...services, newService];
+
+    setServices(addedService);
+
+    // console.log(services);
+    form.reset();
+  };
 
   const handleDelete = (id) => {
-    setServices(services.filter(service => service.id !== id));
+    setServices(services.filter((service) => service.id !== id));
   };
 
-  const handleEdit = (service) => {
-    setEditedService(service);
+  const editbuttonHander = (service) => {
+    console.log(service);
+    setInputState({ ...service });
+    console.log(inputState);
+    setEditedService(!editedService);
   };
 
-  const handleSave = () => {
-    setServices(prevServices =>
-      prevServices.map(service =>
-        service.id === editedService.id ? { ...editedService } : service
-      )
-    );
-    setEditedService(null);
-  };
-
-  const handleInputChange = (e) => {
+  const inputHandler = (e) => {
     const { name, value } = e.target;
-    setEditedService(prevService => ({
-      ...prevService,
-      [name]: value
-    }));
+    setInputState({ ...inputState, [name]: value });
+    console.log(inputState);
   };
 
-  const handleAddService = () => {
-    setServices(prevServices => [
-      ...prevServices,
-      {
-        id: prevServices.length + 1,
-        ...newService
+  const saveService = (id) => {
+    const serviceData = services.map((service) => {
+      if (service.id === id) {
+        (service.price = inputState.price),
+          (service.servicename = inputState.servicename),
+          (service.servicecategory = inputState.servicecategory);
       }
-    ]);
-    setNewService({
-      servicename: '',
-      servicecategory: '',
-      price: 0,
-      description: '',
-      image: '',
+      setEditedService(!editedService);
     });
-  };
-
-  const handleNewInputChange = (e) => {
-    const { name, value } = e.target;
-    setNewService(prevNewService => ({
-      ...prevNewService,
-      [name]: value
-    }));
   };
 
   return (
     <div className="bg-white px-4 pt-3 pb-4 rounded-sm border border-gray-200 flex-1">
       <div className="mb-4">
-        <strong className="text-gray-700 font-medium mb-2">Insert Service</strong>
+        <strong className="text-gray-700 font-medium mb-2">
+          Insert Service
+        </strong>
         <div className="bg-gray-100 p-4 rounded-sm flex flex-col items-start">
-          <input
-            type="text"
-            name="servicename"
-            value={newService.servicename}
-            onChange={handleNewInputChange}
-            placeholder="Service Name"
-            className="w-1/2 border border-gray-400 m-5 p-2 mb-2"
-          />
-          <input
-            type="text"
-            name="servicecategory"
-            value={newService.servicecategory}
-            onChange={handleNewInputChange}
-            placeholder="Service Category"
-            className="w-1/2 border border-gray-400 m-5 p-2 mb-2"
-          />
-          <input
-            type="number"
-            name="price"
-            value={newService.price || ''}
-            onChange={handleNewInputChange}
-            placeholder="Service Price"
-            className="w-1/2 border border-gray-400 m-5 p-2 mb-2"
-          />
-          <textarea
-            name="description"
-            value={newService.description}
-            onChange={handleNewInputChange}
-            placeholder="Service Description"
-            className="w-1/2 border border-gray-400 m-5 p-2 mb-2 h-32 resize-y"
-          />
-          <div className="flex flex-col w-1/2 m-5 mb-2 ">
-            <label htmlFor="image" className="mb-1 text-gray-700 font-bold">Add Image</label>
+          <form onSubmit={serviceSubmit}>
             <input
-              type="file"
-              accept="image/*"
-              name="image"
-              id="image"
-              onChange={handleNewInputChange}
-              className="border border-gray-400 p-2"
+              type="text"
+              name="servicename"
+              placeholder="Service Name"
+              required
+              className="w-1/2 border border-gray-400 m-5 p-2 mb-2"
             />
-          </div>
+            <input
+              type="text"
+              name="servicecategory"
+              placeholder="Service Category"
+              required
+              className="w-1/2 border border-gray-400 m-5 p-2 mb-2"
+            />
+            <input
+              type="number"
+              name="price"
+              placeholder="Service Price"
+              required
+              className="w-1/2 border border-gray-400 m-5 p-2 mb-2"
+            />
+            <textarea
+              name="description"
+              placeholder="Service Description"
+              required
+              className="w-1/2 border border-gray-400 m-5 p-2 mb-2 h-32 resize-y"
+            />
+            <div className="flex flex-col w-1/2 m-5 mb-2 ">
+              <label htmlFor="image" className="mb-1 text-gray-700 font-bold">
+                Add Image
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                name="image"
+                id="image"
+                className="border border-gray-400 p-2"
+              />
+            </div>
 
-          <button
-            className="bg-green-500 hover:bg-green-700 text-white font-bold p-1 px-2 rounded m-5"
-            onClick={handleAddService}
-            disabled={isAddButtonDisabled}
-          >
-            Add Service
-          </button>
+            <button
+              className="bg-green-500 hover:bg-green-700 text-white font-bold p-1 px-2 rounded m-5"
+              type="submit"
+            >
+              Add Service
+            </button>
+          </form>
         </div>
       </div>
 
@@ -149,37 +139,68 @@ const Services = () => {
             </tr>
           </thead>
           <tbody>
-            {services.map(service => (
+            {services.map((service) => (
               <tr key={service.id}>
                 <td>{service.id}</td>
                 <td>
-                  {editedService && editedService.id === service.id ? (
-                    <input type="text" name="servicename" value={editedService.servicename} onChange={handleInputChange} />
+                  {editedService ? (
+                    <input
+                      type="text"
+                      name="servicename"
+                      defaultValue={service.servicename}
+                      onChange={inputHandler}
+                    />
                   ) : (
                     service.servicename
                   )}
                 </td>
                 <td>
-                  {editedService && editedService.id === service.id ? (
-                    <input type="text" name="servicecategory" value={editedService.servicecategory} onChange={handleInputChange} />
+                  {editedService ? (
+                    <input
+                      type="text"
+                      name="servicecategory"
+                      defaultValue={service.servicecategory}
+                      onChange={inputHandler}
+                    />
                   ) : (
                     service.servicecategory
                   )}
                 </td>
                 <td>
-                  {editedService && editedService.id === service.id ? (
-                    <input type="number" name="price" value={editedService.price} onChange={handleInputChange} />
+                  {editedService ? (
+                    <input
+                      type="number"
+                      id=""
+                      name="price"
+                      defaultValue={service.price}
+                      onChange={inputHandler}
+                    />
                   ) : (
                     service.price
                   )}
                 </td>
                 <td>
-                  {editedService && editedService.id === service.id ? (
-                    <button className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded font-bold mr-1" onClick={handleSave}><RxUpdate /></button>
+                  {editedService ? (
+                    <button
+                      className="bg-green-500 hover:bg-green-700 text-white py-1 px-2 rounded font-bold mr-1"
+                      onClick={() => saveService(service.id)}
+                    >
+                      <RxUpdate />
+                    </button>
                   ) : (
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-1" onClick={() => handleEdit(service)}><AiFillEdit /></button>
+                    <button
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded mr-1"
+                      onClick={() => editbuttonHander(service)}
+                    >
+                      <AiFillEdit />
+                    </button>
                   )}
-                  <button className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded font-bold" onClick={() => handleDelete(service.id)}><MdDeleteForever /></button>
+                  <button
+                    className="bg-red-500 hover:bg-red-700 text-white py-1 px-2 rounded font-bold"
+                    onClick={() => handleDelete(service.id)}
+                  >
+                    <MdDeleteForever />
+                  </button>
                 </td>
               </tr>
             ))}
@@ -188,6 +209,6 @@ const Services = () => {
       </div>
     </div>
   );
-}
+};
 
 export default Services;
